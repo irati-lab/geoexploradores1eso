@@ -1,707 +1,521 @@
-import React, { useState } from 'react';
-import { Globe, Layers, Droplets, Cloud, BookOpen, Microscope, ChevronRight, Menu, X, Activity, Mountain, Filter, ArrowDownRight, ArrowUpRight, ArrowRightLeft, Minimize2, Maximize2, PlayCircle, ExternalLink } from 'lucide-react';
-
-// Estilos personalizados inyectados
-const CustomStyles = () => (
-    <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap');
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoExploradores: La Tierra</title>
+    
+    <!-- Tailwind CSS (Estilos rápidos y modernos) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        /* --- ESTILOS PERSONALIZADOS --- */
+        body { 
+            font-family: system-ui, -apple-system, sans-serif; 
+            background-color: #f0f9ff; /* Azul muy pálido (cielo/hielo) */
+            scroll-behavior: smooth; 
+        }
         
-        .font-sans { font-family: 'Open Sans', sans-serif; }
-        .font-display { font-family: 'Nunito', sans-serif; }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-
+        /* Animaciones suaves al cambiar de sección */
+        .fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .image-placeholder {
-            border: 2px dashed #94a3b8;
-            background-color: #f1f5f9;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #64748b;
-            font-weight: 600;
-            text-align: center;
-            min-height: 200px;
+        /* Ocultar secciones no activas */
+        .section-content { display: none; }
+        .section-content.active { display: block; }
+
+        /* Estilos para el diagrama de capas de la Tierra */
+        .layer-ring { 
+            transition: all 0.3s ease; 
+            cursor: pointer; 
+        }
+        .layer-ring:hover { 
+            transform: scale(1.03); 
+            filter: brightness(1.1); 
+            box-shadow: 0 0 15px rgba(255,255,255,0.5);
+        }
+
+        /* Marcos para las imágenes (estilo polaroid/educativo) */
+        .photo-frame {
+            background: white;
+            padding: 0.75rem;
             border-radius: 0.5rem;
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s;
         }
-        
-        .image-placeholder img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-    `}</style>
-);
+        .photo-frame:hover { transform: rotate(-1deg); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-slate-800">
 
-// Componente de navegación principal
-const Navigation = ({ activeSection, setActiveSection, toggleMenu, isMenuOpen }) => {
-    const navItems = [
-        { id: 'home', label: 'Inicio', icon: Globe },
-        { id: 'geosphere', label: 'Geosfera', icon: Layers },
-        { id: 'hydrosphere', label: 'Hidrosfera', icon: Droplets },
-        { id: 'atmosphere', label: 'Atmósfera', icon: Cloud },
-        { id: 'projects', label: 'Miniproyectos', icon: Microscope },
-    ];
-
-    return (
-        <nav className="bg-slate-900 text-white sticky top-0 z-50 shadow-lg border-b-4 border-blue-500 font-display">
-            <div className="max-w-7xl mx-auto px-4">
-                <div className="flex justify-between items-center h-16">
-                    <div className="flex items-center space-x-2 cursor-pointer" onClick={() => setActiveSection('home')}>
-                        <Globe className="h-8 w-8 text-green-400" />
-                        <span className="font-bold text-xl tracking-tight text-blue-100">GeoExploradores 1º ESO</span>
-                    </div>
-                    
-                    {/* Desktop Menu */}
-                    <div className="hidden md:flex space-x-1">
-                        {navItems.map((item) => (
-                            <button
-                                key={item.id}
-                                onClick={() => setActiveSection(item.id)}
-                                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center space-x-1
-                                    ${activeSection === item.id 
-                                        ? 'bg-blue-600 text-white' 
-                                        : 'text-slate-300 hover:bg-slate-800 hover:text-white'}`}
-                            >
-                                <item.icon className="h-4 w-4" />
-                                <span>{item.label}</span>
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Mobile menu button */}
-                    <div className="md:hidden flex items-center">
-                        <button onClick={toggleMenu} className="text-slate-300 hover:text-white p-2">
-                            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                        </button>
-                    </div>
+    <!-- === BARRA DE NAVEGACIÓN === -->
+    <nav class="bg-slate-900 text-white sticky top-0 z-50 border-b-4 border-blue-500 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center space-x-2 cursor-pointer" onclick="showSection('home')">
+                    <i data-lucide="globe" class="h-8 w-8 text-green-400"></i>
+                    <span class="font-bold text-xl tracking-tight text-blue-100">GeoExploradores 1º ESO</span>
                 </div>
-            </div>
-
-            {/* Mobile Menu Dropdown */}
-            {isMenuOpen && (
-                <div className="md:hidden bg-slate-800 pb-4">
-                    {navItems.map((item) => (
-                        <button
-                            key={item.id}
-                            onClick={() => { setActiveSection(item.id); toggleMenu(); }}
-                            className={`block w-full text-left px-4 py-3 text-base font-medium border-l-4 
-                                ${activeSection === item.id 
-                                    ? 'bg-slate-700 border-blue-500 text-white' 
-                                    : 'border-transparent text-slate-300 hover:bg-slate-700 hover:text-white'}`}
-                        >
-                            <div className="flex items-center space-x-3">
-                                <item.icon className="h-5 w-5" />
-                                <span>{item.label}</span>
-                            </div>
-                        </button>
-                    ))}
-                </div>
-            )}
-        </nav>
-    );
-};
-
-// Componente: Tarjeta de Concepto
-const ConceptCard = ({ title, content, color, icon: Icon }) => (
-    <div className={`bg-white rounded-xl shadow-md p-6 border-l-4 ${color} transform hover:-translate-y-1 transition-all duration-300 font-sans`}>
-        <div className="flex items-center mb-4">
-            <div className={`p-3 rounded-full ${color.replace('border-', 'bg-').replace('500', '100')} mr-4`}>
-                <Icon className={`h-6 w-6 ${color.replace('border-', 'text-').replace('500', '600')}`} />
-            </div>
-            <h3 className="text-xl font-bold text-slate-800 font-display">{title}</h3>
-        </div>
-        <p className="text-slate-600 leading-relaxed">{content}</p>
-    </div>
-);
-
-// Componente: Placeholder de Imagen
-const ImageBox = ({ id, label, currentUrl }) => {
-    const [url, setUrl] = useState(currentUrl || "");
-    const [isEditing, setIsEditing] = useState(false);
-
-    return (
-        <div className="w-full my-6 font-sans">
-            <div className="image-placeholder group relative bg-slate-100">
-                {url ? (
-                    <img src={url} alt={label} onError={(e) => {e.target.onerror = null; e.target.src = "https://placehold.co/600x400?text=Error+Cargando+Imagen";}} />
-                ) : (
-                    <div className="flex flex-col items-center p-8">
-                        <div className="bg-slate-200 p-4 rounded-full mb-2">
-                            <Globe className="h-8 w-8 text-slate-400" />
-                        </div>
-                        <span className="text-slate-500 text-sm font-bold uppercase tracking-wider font-display">{label}</span>
-                        <span className="text-slate-400 text-xs mt-1">Espacio para imagen (ID: {id})</span>
-                    </div>
-                )}
                 
-                <button 
-                    onClick={() => setIsEditing(!isEditing)}
-                    className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Cambiar URL de imagen"
-                >
-                    <BookOpen className="h-4 w-4" />
+                <!-- Menú Escritorio -->
+                <div class="hidden md:flex space-x-1">
+                    <button onclick="showSection('home')" class="nav-btn px-3 py-2 rounded hover:bg-slate-700 transition flex items-center gap-2"><i data-lucide="home" class="w-4 h-4"></i> Inicio</button>
+                    <button onclick="showSection('geosphere')" class="nav-btn px-3 py-2 rounded hover:bg-slate-700 transition flex items-center gap-2"><i data-lucide="layers" class="w-4 h-4"></i> Geosfera</button>
+                    <button onclick="showSection('hydrosphere')" class="nav-btn px-3 py-2 rounded hover:bg-slate-700 transition flex items-center gap-2"><i data-lucide="droplets" class="w-4 h-4"></i> Hidrosfera</button>
+                    <button onclick="showSection('atmosphere')" class="nav-btn px-3 py-2 rounded hover:bg-slate-700 transition flex items-center gap-2"><i data-lucide="cloud" class="w-4 h-4"></i> Atmósfera</button>
+                    <button onclick="showSection('projects')" class="nav-btn px-3 py-2 rounded bg-blue-600 hover:bg-blue-700 transition font-bold flex items-center gap-2"><i data-lucide="microscope" class="w-4 h-4"></i> Proyectos</button>
+                </div>
+
+                <!-- Botón Menú Móvil -->
+                <button onclick="toggleMobileMenu()" class="md:hidden text-white p-2">
+                    <i data-lucide="menu" class="h-6 w-6"></i>
                 </button>
             </div>
-            
-            {isEditing && (
-                <div className="mt-2 flex gap-2">
-                    <input 
-                        type="text" 
-                        value={url} 
-                        onChange={(e) => setUrl(e.target.value)}
-                        placeholder="Pega aquí la URL de la imagen..."
-                        className="flex-1 p-2 border rounded-md text-sm"
-                    />
-                    <button 
-                        onClick={() => setIsEditing(false)}
-                        className="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-bold hover:bg-green-700"
-                    >
-                        Guardar
-                    </button>
+        </div>
+        
+        <!-- Menú Móvil Desplegable -->
+        <div id="mobile-menu" class="hidden md:hidden bg-slate-800 border-t border-slate-700">
+            <button onclick="showSection('home')" class="block w-full text-left px-4 py-3 hover:bg-slate-700 border-b border-slate-700">Inicio</button>
+            <button onclick="showSection('geosphere')" class="block w-full text-left px-4 py-3 hover:bg-slate-700 border-b border-slate-700">Geosfera</button>
+            <button onclick="showSection('hydrosphere')" class="block w-full text-left px-4 py-3 hover:bg-slate-700 border-b border-slate-700">Hidrosfera</button>
+            <button onclick="showSection('atmosphere')" class="block w-full text-left px-4 py-3 hover:bg-slate-700 border-b border-slate-700">Atmósfera</button>
+            <button onclick="showSection('projects')" class="block w-full text-left px-4 py-3 bg-slate-900 text-blue-300 font-bold">Miniproyectos</button>
+        </div>
+    </nav>
+
+    <!-- === CONTENIDO PRINCIPAL === -->
+    <main class="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
+
+        <!-- SECCIÓN 1: INICIO -->
+        <section id="home" class="section-content active fade-in">
+            <div class="text-center py-12 px-4 bg-gradient-to-b from-blue-600 to-blue-400 rounded-3xl shadow-xl text-white mb-10 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-4 drop-shadow-md relative z-10">Nuestro Planeta Azul</h1>
+                <p class="text-xl max-w-2xl mx-auto font-light relative z-10">Un viaje científico para descubrir qué hace única a la Tierra en el Universo.</p>
+                <div class="mt-6 flex justify-center gap-4 relative z-10">
+                    <span class="px-4 py-1 bg-white/20 rounded-full text-sm backdrop-blur-sm">🌍 3er Planeta del Sistema Solar</span>
+                    <span class="px-4 py-1 bg-white/20 rounded-full text-sm backdrop-blur-sm">💧 El Planeta de Agua</span>
                 </div>
-            )}
-        </div>
-    );
-};
-
-// SECCIÓN: INICIO
-const HomeSection = () => (
-    <div className="space-y-12 animate-fade-in font-sans">
-        <div className="text-center py-16 px-4 bg-gradient-to-b from-blue-500 to-blue-400 rounded-3xl shadow-xl text-white relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-                <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full mix-blend-overlay blur-xl"></div>
-                <div className="absolute bottom-10 right-10 w-64 h-64 bg-green-300 rounded-full mix-blend-overlay blur-2xl"></div>
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl font-extrabold mb-6 animate-float font-display">Nuestro Planeta Azul</h1>
-            <p className="text-xl md:text-2xl max-w-3xl mx-auto font-light leading-relaxed">
-                Bienvenido a tu viaje científico por la Tierra. Desde el núcleo ardiente hasta los límites del espacio,
-                descubre por qué nuestro hogar es único en el Universo.
-            </p>
-            <div className="mt-8 flex justify-center gap-4">
-                <span className="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm text-sm font-semibold font-display">🌍 3ª Roca desde el Sol</span>
-                <span className="bg-white/20 px-4 py-2 rounded-full backdrop-blur-sm text-sm font-semibold font-display">💧 El Planeta de Agua</span>
-            </div>
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-8 items-center">
-            <div>
-                <h2 className="text-3xl font-bold text-slate-800 mb-4 border-l-8 border-green-500 pl-4 font-display">¿Qué vamos a aprender?</h2>
-                <ul className="space-y-4 text-lg text-slate-600">
-                    <li className="flex items-start">
-                        <ChevronRight className="h-6 w-6 text-green-500 mt-1 flex-shrink-0" />
-                        <span>La <strong>Geosfera</strong>: Las capas rocosas y sus deformaciones.</span>
-                    </li>
-                    <li className="flex items-start">
-                        <ChevronRight className="h-6 w-6 text-blue-500 mt-1 flex-shrink-0" />
-                        <span>La <strong>Hidrosfera</strong>: Mares, ríos y el hielo polar.</span>
-                    </li>
-                    <li className="flex items-start">
-                        <ChevronRight className="h-6 w-6 text-sky-400 mt-1 flex-shrink-0" />
-                        <span>La <strong>Atmósfera</strong>: El aire que nos protege.</span>
-                    </li>
-                    <li className="flex items-start">
-                        <ChevronRight className="h-6 w-6 text-purple-500 mt-1 flex-shrink-0" />
-                        <span>La <strong>Biosfera</strong>: ¡Nosotros y todos los seres vivos!</span>
-                    </li>
-                </ul>
-            </div>
-            <ImageBox 
-                id="img-home-overview" 
-                label="Vista Satelital de la Tierra"
-                currentUrl="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/ird/lurra.png"
-            />
-        </div>
-    </div>
-);
-
-// SECCIÓN: GEOSFERA
-const GeosphereSection = () => {
-    const [activeLayer, setActiveLayer] = useState(null);
-
-    const layers = [
-        { id: 'corteza', name: 'Corteza', depth: '0-70 km', temp: 'Ambiente - 400°C', color: 'bg-amber-700', text: 'La piel de la Tierra. Sólida y rocosa. Se divide en oceánica (más fina) y continental (más gruesa).' },
-        { id: 'manto', name: 'Manto', depth: '70-2900 km', temp: '1000°C - 3700°C', color: 'bg-orange-600', text: 'La capa más gruesa (84% del volumen). Rocas sólidas pero plásticas que se mueven lentamente (convección).' },
-        { id: 'nucleo-ext', name: 'Núcleo Externo', depth: '2900-5150 km', temp: '4500°C - 5500°C', color: 'bg-red-600', text: 'Metal LÍQUIDO (Hierro y Níquel). Su movimiento genera el campo magnético de la Tierra.' },
-        { id: 'nucleo-int', name: 'Núcleo Interno', depth: '5150-6371 km', temp: '> 6000°C', color: 'bg-yellow-400', text: 'Metal SÓLIDO debido a la inmensa presión. Es tan caliente como la superficie del Sol.' },
-    ];
-
-    return (
-        <div className="space-y-10 animate-fade-in font-sans">
-            <div className="bg-amber-50 p-6 rounded-2xl border-2 border-amber-200">
-                <h2 className="text-3xl font-bold text-amber-900 mb-2 font-display">La Geosfera: Un Viaje al Centro</h2>
-                <p className="text-amber-800">Imagina que cortamos la Tierra como si fuera una fruta. Encontraríamos capas muy diferentes.</p>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-12">
-                {/* Interactive Diagram */}
-                <div className="relative flex flex-col items-center">
-                    <h3 className="text-xl font-bold text-slate-700 mb-6 font-display">Toca las capas para explorar</h3>
-                    
-                    {/* Visual Representation of Layers */}
-                    <div className="w-80 h-80 rounded-full relative cursor-pointer overflow-hidden shadow-2xl border-4 border-blue-200">
-                        {/* Z-INDEX FIX: Las capas internas deben tener un z-index MAYOR que las externas. */}
-                        <div 
-                            className={`absolute inset-0 rounded-full border-[12px] border-amber-700 z-10 transition-all hover:scale-105 ${activeLayer === 'corteza' ? 'scale-105 ring-4 ring-amber-300' : ''}`}
-                            onClick={() => setActiveLayer('corteza')}
-                        ></div>
-                        <div 
-                            className={`absolute top-3 left-3 right-3 bottom-3 rounded-full bg-orange-600 z-20 transition-all ${activeLayer === 'manto' ? 'scale-105 ring-4 ring-orange-300' : ''}`}
-                            onClick={(e) => {e.stopPropagation(); setActiveLayer('manto');}}
-                        ></div>
-                        <div 
-                            className={`absolute top-16 left-16 right-16 bottom-16 rounded-full bg-red-600 z-30 transition-all ${activeLayer === 'nucleo-ext' ? 'scale-110 ring-4 ring-red-300' : ''}`}
-                            onClick={(e) => {e.stopPropagation(); setActiveLayer('nucleo-ext');}}
-                        ></div>
-                        <div 
-                            className={`absolute top-28 left-28 right-28 bottom-28 rounded-full bg-yellow-400 z-40 transition-all ${activeLayer === 'nucleo-int' ? 'scale-125 ring-4 ring-yellow-200 shadow-[0_0_20px_rgba(255,255,0,0.8)]' : ''}`}
-                            onClick={(e) => {e.stopPropagation(); setActiveLayer('nucleo-int');}}
-                        ></div>
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="space-y-6">
+                    <div class="border-l-4 border-green-500 pl-6 py-2">
+                        <h2 class="text-3xl font-bold text-slate-800">¿Qué vamos a investigar?</h2>
+                        <p class="text-slate-600 mt-2">La Tierra es un sistema complejo donde todo está conectado.</p>
+                    </div>
+                    <ul class="space-y-4 text-lg text-slate-700">
+                        <li class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                            <div class="bg-orange-100 p-2 rounded-full"><i data-lucide="layers" class="text-orange-600"></i></div>
+                            <span><strong>Geosfera:</strong> Rocas, volcanes y terremotos.</span>
+                        </li>
+                        <li class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                            <div class="bg-blue-100 p-2 rounded-full"><i data-lucide="droplets" class="text-blue-600"></i></div>
+                            <span><strong>Hidrosfera:</strong> El agua y su ciclo vital.</span>
+                        </li>
+                        <li class="flex items-center gap-3 p-3 bg-white rounded-lg shadow-sm">
+                            <div class="bg-sky-100 p-2 rounded-full"><i data-lucide="cloud" class="text-sky-500"></i></div>
+                            <span><strong>Atmósfera:</strong> El aire que nos protege.</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- IMAGEN INICIO -->
+                <div class="photo-frame">
+                    <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/ird/lurra.png" 
+                         alt="La Tierra desde el espacio" 
+                         class="w-full h-auto rounded shadow-sm object-cover aspect-video">
+                    <p class="text-center text-xs text-slate-500 mt-2 font-medium">Nuestro hogar visto desde el espacio</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 2: GEOSFERA -->
+        <section id="geosphere" class="section-content fade-in">
+            <div class="bg-orange-50 p-6 rounded-2xl border-2 border-orange-200 mb-8 flex items-start gap-4">
+                <div class="bg-orange-100 p-3 rounded-full hidden md:block">
+                    <i data-lucide="layers" class="h-8 w-8 text-orange-600"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-orange-900 mb-2">La Geosfera</h2>
+                    <p class="text-orange-800">Es la parte rocosa del planeta. Se divide en capas según su composición y temperatura. ¡Toca el diagrama para explorarlas!</p>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 mb-12">
+                <!-- Diagrama Interactivo (CSS Puro + JS) -->
+                <div class="flex flex-col items-center justify-center">
+                    <div class="relative w-80 h-80 group">
+                        <!-- Corteza -->
+                        <div onclick="updateLayerInfo('corteza')" class="layer-ring absolute inset-0 rounded-full border-[14px] border-amber-800 bg-orange-600 z-10 shadow-xl flex items-start justify-center pt-2" title="Corteza">
+                            <span class="text-[10px] text-white font-bold bg-black/20 px-1 rounded mt-1">Corteza</span>
+                        </div>
+                        <!-- Manto -->
+                        <div onclick="updateLayerInfo('manto')" class="layer-ring absolute top-5 left-5 right-5 bottom-5 rounded-full bg-orange-500 z-20 border-2 border-orange-400 flex items-start justify-center pt-8" title="Manto">
+                            <span class="text-[10px] text-white/80 font-bold">Manto</span>
+                        </div>
+                        <!-- N. Externo -->
+                        <div onclick="updateLayerInfo('externo')" class="layer-ring absolute top-20 left-20 right-20 bottom-20 rounded-full bg-red-600 z-30 border-2 border-red-500 flex items-center justify-center" title="Núcleo Externo">
+                            <span class="text-[10px] text-white font-bold">N. Ext</span>
+                        </div>
+                        <!-- N. Interno -->
+                        <div onclick="updateLayerInfo('interno')" class="layer-ring absolute top-32 left-32 right-32 bottom-32 rounded-full bg-yellow-300 z-40 border-4 border-yellow-100 shadow-[0_0_20px_rgba(255,230,0,0.9)] flex items-center justify-center" title="Núcleo Interno">
+                        </div>
+                    </div>
+                    <p class="text-sm text-slate-500 mt-4 italic flex items-center gap-1"><i data-lucide="mouse-pointer-2" class="w-4 h-4"></i> Haz clic en los anillos</p>
+                </div>
+                
+                <!-- Panel de Info Dinámico -->
+                <div id="layer-info-panel" class="bg-white p-8 rounded-xl shadow-md border border-slate-200 flex flex-col justify-center min-h-[250px] transition-colors duration-500">
+                    <div class="text-center text-slate-400">
+                        <i data-lucide="circle-dashed" class="h-12 w-12 mx-auto mb-2 opacity-50"></i>
+                        <h3 class="text-xl font-bold mb-2">Explora el interior</h3>
+                        <p>Selecciona una capa en el dibujo de la izquierda.</p>
                     </div>
                 </div>
+            </div>
 
-                {/* Info Panel */}
-                <div className="space-y-4">
-                        {activeLayer ? (
-                        (() => {
-                            const layer = layers.find(l => l.id === activeLayer);
-                            return (
-                                <div className={`p-6 rounded-xl text-white shadow-lg animate-fade-in ${layer.color}`}>
-                                    <h3 className="text-2xl font-bold mb-2 font-display">{layer.name}</h3>
-                                    <div className="flex gap-4 mb-4 text-sm font-semibold bg-black/20 p-3 rounded-lg">
-                                        <span>📏 {layer.depth}</span>
-                                        <span>🌡️ {layer.temp}</span>
-                                    </div>
-                                    <p className="text-lg leading-relaxed">{layer.text}</p>
-                                </div>
-                            );
-                        })()
-                    ) : (
-                        <div className="h-full flex items-center justify-center p-8 bg-slate-100 rounded-xl border-2 border-dashed border-slate-300 text-slate-500 text-center">
-                            <p>Selecciona una capa en el diagrama<br/>para ver su información científica.</p>
+            <!-- Subsección: Dinámica (Pliegues y Fallas) -->
+            <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden mb-8">
+                <div class="bg-amber-700 p-4 text-white flex justify-between items-center">
+                    <h3 class="text-2xl font-bold flex items-center gap-2"><i data-lucide="mountain"></i> Dinámica Terrestre</h3>
+                    <span class="text-sm bg-white/20 px-3 py-1 rounded-full">Fuerzas Internas</span>
+                </div>
+                <div class="p-6 grid md:grid-cols-2 gap-8">
+                    <!-- Pliegues -->
+                    <div class="space-y-4">
+                        <div class="border-b border-amber-200 pb-2">
+                            <h4 class="text-xl font-bold text-amber-800 flex items-center gap-2">
+                                <span class="bg-amber-100 w-8 h-8 flex items-center justify-center rounded-full text-sm">1</span> 
+                                Pliegues
+                            </h4>
+                            <p class="text-xs font-bold text-amber-600 uppercase tracking-wide ml-10">Rocas Plásticas (Blandas)</p>
                         </div>
-                    )}
+                        <p class="text-sm text-slate-600">Cuando las fuerzas comprimen rocas que no son rígidas, estas se ondulan sin romperse.</p>
+                        <ul class="text-sm text-slate-700 bg-amber-50 p-3 rounded-lg border border-amber-100">
+                            <li><strong>Anticlinal:</strong> Forma de "A" (montaña).</li>
+                            <li><strong>Sinclinal:</strong> Forma de "U" (valle).</li>
+                        </ul>
+                        <!-- IMAGEN PLIEGUES -->
+                        <div class="photo-frame">
+                            <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/ird/anticlinalysinclinal.png" alt="Esquema de Anticlinal y Sinclinal" class="w-full rounded">
+                        </div>
+                    </div>
+
+                    <!-- Fallas -->
+                    <div class="space-y-4">
+                        <div class="border-b border-stone-200 pb-2">
+                            <h4 class="text-xl font-bold text-stone-800 flex items-center gap-2">
+                                <span class="bg-stone-100 w-8 h-8 flex items-center justify-center rounded-full text-sm">2</span> 
+                                Fallas
+                            </h4>
+                            <p class="text-xs font-bold text-stone-500 uppercase tracking-wide ml-10">Rocas Rígidas (Duras)</p>
+                        </div>
+                        <p class="text-sm text-slate-600">Cuando las rocas son demasiado duras, la fuerza las rompe y un bloque se desplaza. ¡Así nacen los terremotos!</p>
+                        <div class="text-sm text-slate-700 bg-stone-50 p-3 rounded-lg border border-stone-100 flex gap-2 justify-around text-center font-bold text-xs">
+                            <span>Normal<br>(Tensión)</span>
+                            <span>Inversa<br>(Compresión)</span>
+                            <span>Desgarre<br>(Cizalla)</span>
+                        </div>
+                        <!-- IMAGEN FALLAS -->
+                        <div class="photo-frame">
+                            <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/ird/fallas.png" alt="Tipos de Fallas Geológicas" class="w-full rounded">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECCIÓN 3: HIDROSFERA -->
+        <section id="hydrosphere" class="section-content fade-in">
+            <div class="bg-blue-50 p-6 rounded-2xl border-2 border-blue-200 mb-8 flex items-start gap-4">
+                <div class="bg-blue-100 p-3 rounded-full hidden md:block">
+                    <i data-lucide="droplets" class="h-8 w-8 text-blue-600"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-900 mb-2">La Hidrosfera</h2>
+                    <p class="text-blue-800">El conjunto de toda el agua del planeta. Es única porque la encontramos en los tres estados a la vez.</p>
                 </div>
             </div>
 
-            {/* Nueva Sección: Dinámica Terrestre (Pliegues y Fallas) */}
-            <div className="mt-12 bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
-                <div className="bg-amber-600 p-4 text-white">
-                    <h3 className="text-2xl font-bold flex items-center gap-2 font-display">
-                        <Mountain className="h-6 w-6" />
-                        Cuando la Tierra se mueve: Pliegues y Fallas
-                    </h3>
+            <!-- Ciclo del Agua -->
+            <div class="bg-white p-6 rounded-xl shadow-md mb-8 border border-blue-100">
+                <h3 class="text-2xl font-bold text-slate-800 mb-4 text-center border-b pb-4">El Ciclo del Agua</h3>
+                <!-- IMAGEN CICLO -->
+                <div class="photo-frame max-w-4xl mx-auto transform hover:scale-[1.01] transition-transform">
+                    <img src="https://educativo.ign.es/atlas-didactico/agua-eso/05_02_agua_eso_cicloagua.jpg" 
+                         alt="Diagrama del Ciclo del Agua - IGN" 
+                         class="w-full h-auto rounded">
                 </div>
-                <div className="p-6">
-                    <p className="mb-6 text-slate-700">
-                        La corteza terrestre no está quieta. Cuando las fuerzas empujan las rocas, estas reaccionan de forma distinta según si son blandas o rígidas.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-8">
-                        {/* Pliegues */}
-                        <div className="bg-amber-50 p-6 rounded-xl border border-amber-100">
-                            <h4 className="text-xl font-bold text-amber-800 mb-2 font-display border-b border-amber-200 pb-2">1. Pliegues (Rocas Plásticas)</h4>
-                            <p className="text-sm text-amber-700 mb-4">Las rocas se doblan por <strong>Compresión</strong> sin romperse.</p>
-                            <ul className="space-y-3">
-                                <li className="flex gap-3 items-center">
-                                    <div className="w-12 h-12 rounded bg-white border-2 border-amber-300 flex items-end justify-center pb-1 shadow-sm">
-                                        <div className="w-8 h-8 border-t-4 border-l-4 border-r-4 border-amber-600 rounded-t-full"></div>
-                                    </div>
-                                    <div>
-                                        <span className="font-bold text-slate-800 block">Anticlinal</span>
-                                        <span className="text-xs text-slate-600">Forma de "A" (Convexa)</span>
-                                    </div>
-                                </li>
-                                <li className="flex gap-3 items-center">
-                                    <div className="w-12 h-12 rounded bg-white border-2 border-amber-300 flex items-start justify-center pt-1 shadow-sm">
-                                        <div className="w-8 h-8 border-b-4 border-l-4 border-r-4 border-amber-600 rounded-b-full"></div>
-                                    </div>
-                                    <div>
-                                        <span className="font-bold text-slate-800 block">Sinclinal</span>
-                                        <span className="text-xs text-slate-600">Forma de "U" (Cóncava)</span>
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
+            </div>
 
-                        {/* Fallas */}
-                        <div className="bg-stone-50 p-6 rounded-xl border border-stone-200">
-                            <h4 className="text-xl font-bold text-stone-800 mb-2 font-display border-b border-stone-200 pb-2">2. Fallas (Rocas Rígidas)</h4>
-                            <p className="text-sm text-stone-700 mb-4">Las rocas son duras y se <strong>rompen</strong>, desplazándose un bloque respecto al otro.</p>
-                            
-                            <div className="space-y-3">
-                                {/* Falla Normal */}
-                                <div className="bg-white p-3 rounded-lg border border-stone-200 flex items-center gap-3 shadow-sm hover:scale-105 transition-transform">
-                                    <div className="bg-stone-100 p-2 rounded text-stone-500">
-                                        <Maximize2 className="h-5 w-5 rotate-45" />
-                                    </div>
-                                    <div>
-                                        <h5 className="font-bold text-stone-800 text-sm">Falla Normal</h5>
-                                        <p className="text-xs text-stone-600">Por <strong>Tensión</strong> (se estira). Un bloque resbala hacia abajo.</p>
-                                    </div>
-                                </div>
+            <!-- Estados del Agua -->
+            <div class="grid md:grid-cols-3 gap-6 text-center">
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-sm border border-blue-200">
+                    <span class="text-5xl block mb-3">🧊</span>
+                    <h4 class="font-bold text-blue-900 text-lg">Sólido</h4>
+                    <p class="text-sm text-blue-700 mt-2">Hielo en los Polos y Glaciares.</p>
+                    <span class="text-xs bg-white px-2 py-1 rounded mt-2 inline-block">Criosfera</span>
+                </div>
+                <div class="bg-gradient-to-br from-blue-100 to-blue-200 p-6 rounded-xl shadow-sm border border-blue-300">
+                    <span class="text-5xl block mb-3">🌊</span>
+                    <h4 class="font-bold text-blue-900 text-lg">Líquido</h4>
+                    <p class="text-sm text-blue-800 mt-2">Océanos (97%), Mares, Ríos y Lagos.</p>
+                    <span class="text-xs bg-white px-2 py-1 rounded mt-2 inline-block">Agua Superficial</span>
+                </div>
+                <div class="bg-gradient-to-br from-slate-50 to-slate-200 p-6 rounded-xl shadow-sm border border-slate-300">
+                    <span class="text-5xl block mb-3">☁️</span>
+                    <h4 class="font-bold text-slate-800 text-lg">Gaseoso</h4>
+                    <p class="text-sm text-slate-600 mt-2">Vapor de agua invisible en el aire.</p>
+                    <span class="text-xs bg-white px-2 py-1 rounded mt-2 inline-block">Humedad</span>
+                </div>
+            </div>
+        </section>
 
-                                {/* Falla Inversa */}
-                                <div className="bg-white p-3 rounded-lg border border-stone-200 flex items-center gap-3 shadow-sm hover:scale-105 transition-transform">
-                                    <div className="bg-stone-100 p-2 rounded text-stone-500">
-                                        <Minimize2 className="h-5 w-5 rotate-45" />
-                                    </div>
-                                    <div>
-                                        <h5 className="font-bold text-stone-800 text-sm">Falla Inversa</h5>
-                                        <p className="text-xs text-stone-600">Por <strong>Compresión</strong> (se aplasta). Un bloque sube sobre el otro.</p>
-                                    </div>
-                                </div>
+        <!-- SECCIÓN 4: ATMÓSFERA -->
+        <section id="atmosphere" class="section-content fade-in">
+            <div class="bg-sky-50 p-6 rounded-2xl border-2 border-sky-200 mb-8 flex items-start gap-4">
+                <div class="bg-sky-100 p-3 rounded-full hidden md:block">
+                    <i data-lucide="cloud" class="h-8 w-8 text-sky-600"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold text-sky-900 mb-2">La Atmósfera</h2>
+                    <p class="text-sky-800">El escudo gaseoso. Sin ella, no tendríamos aire, nos quemaría el sol y nos congelaríamos de noche.</p>
+                </div>
+            </div>
 
-                                {/* Falla de Desgarre */}
-                                <div className="bg-white p-3 rounded-lg border border-stone-200 flex items-center gap-3 shadow-sm hover:scale-105 transition-transform">
-                                    <div className="bg-stone-100 p-2 rounded text-stone-500">
-                                        <ArrowRightLeft className="h-5 w-5" />
-                                    </div>
-                                    <div>
-                                        <h5 className="font-bold text-stone-800 text-sm">Falla de Desgarre</h5>
-                                        <p className="text-xs text-stone-600">Por <strong>Cizalla</strong> (roce lateral). Se mueven horizontalmente.</p>
-                                    </div>
-                                </div>
+            <div class="grid md:grid-cols-2 gap-10">
+                <div class="space-y-6">
+                    <!-- Composición -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-8 border-green-500">
+                        <h3 class="font-bold text-slate-800 text-xl mb-4 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-5 h-5 text-green-600"></i> Composición del Aire
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm font-bold mb-1"><span>Nitrógeno (78%)</span> <span>🔵</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-blue-600 h-3 rounded-full" style="width: 78%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm font-bold mb-1"><span>Oxígeno (21%)</span> <span>🟢</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-green-500 h-3 rounded-full" style="width: 21%"></div></div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm font-bold mb-1"><span>Otros (1%)</span> <span>⚪</span></div>
+                                <div class="w-full bg-gray-200 rounded-full h-3"><div class="bg-gray-400 h-3 rounded-full" style="width: 1%"></div></div>
+                                <p class="text-xs text-gray-500 mt-1">Argón, CO2, Vapor de agua...</p>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Funciones -->
+                    <div class="bg-sky-100 p-6 rounded-xl border border-sky-200">
+                        <h3 class="font-bold text-sky-900 text-lg mb-2">¿Para qué sirve?</h3>
+                        <ul class="list-disc list-inside space-y-2 text-sky-800 text-sm">
+                            <li>Filtra las radiaciones solares dañinas (Capa de Ozono).</li>
+                            <li>Regula la temperatura (Efecto Invernadero natural).</li>
+                            <li>Nos protege del impacto de meteoritos.</li>
+                            <li>Permite el clima y el ciclo del agua.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- IMAGEN ATMOSFERA -->
+                <div class="photo-frame">
+                    <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/ird/atmosfera.png" 
+                         alt="Capas de la Atmósfera" 
+                         class="w-full h-auto rounded">
+                    <p class="text-center text-xs text-slate-500 mt-2">Estructura vertical de la atmósfera</p>
                 </div>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-6 mt-6">
-                <ImageBox 
-                    id="img-geosfera-pliegues" 
-                    label="Fotografía de un pliegue real en una montaña" 
-                    currentUrl="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/ird/anticlinalysinclinal.png"
-                />
-                <ImageBox 
-                    id="img-geosfera-fallas" 
-                    label="Esquema o foto de una falla geológica" 
-                    currentUrl="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/ird/fallas.png"
-                />
-            </div>
-        </div>
-    );
-};
+        </section>
 
-// SECCIÓN: HIDROSFERA
-const HydrosphereSection = () => (
-    <div className="space-y-8 animate-fade-in font-sans">
-        <div className="bg-blue-50 p-6 rounded-2xl border-2 border-blue-200">
-            <h2 className="text-3xl font-bold text-blue-900 mb-2 font-display">La Hidrosfera: El Planeta Azul</h2>
-            <p className="text-blue-800">El agua cubre el 71% de la superficie terrestre. Sin ella, la vida no existiría tal como la conocemos.</p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-            <ConceptCard 
-                title="Agua Salada" 
-                content="El 97% del agua está en los Océanos y Mares. Es salada y no potable directamente."
-                color="border-blue-600"
-                icon={Droplets}
-            />
-            <ConceptCard 
-                title="Agua Dulce" 
-                content="Solo el 3% es agua dulce. De ese 3%, la mayoría está congelada en los polos."
-                color="border-cyan-500"
-                icon={Droplets}
-            />
-            <ConceptCard 
-                title="Ciclo del Agua" 
-                content="Evaporación ➔ Condensación ➔ Precipitación ➔ Retorno. ¡El agua siempre está viajando!"
-                color="border-green-500"
-                icon={Globe}
-            />
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-md">
-            <h3 className="text-2xl font-bold text-slate-800 mb-4 font-display">Estados del Agua en la Tierra</h3>
-            <div className="grid md:grid-cols-3 gap-4 text-center">
-                <div className="p-4 bg-blue-100 rounded-lg">
-                    <span className="text-4xl">🧊</span>
-                    <h4 className="font-bold mt-2 text-blue-900 font-display">Sólido</h4>
-                    <p className="text-sm text-blue-700">Glaciares y Polos (Criosfera)</p>
+        <!-- SECCIÓN 5: MINIPROYECTOS -->
+        <section id="projects" class="section-content fade-in">
+            <div class="bg-purple-50 p-6 rounded-2xl border-2 border-purple-200 mb-8 flex items-start gap-4">
+                <div class="bg-purple-100 p-3 rounded-full hidden md:block">
+                    <i data-lucide="microscope" class="h-8 w-8 text-purple-600"></i>
                 </div>
-                <div className="p-4 bg-blue-200 rounded-lg">
-                    <span className="text-4xl">🌊</span>
-                    <h4 className="font-bold mt-2 text-blue-900 font-display">Líquido</h4>
-                    <p className="text-sm text-blue-700">Océanos, Ríos, Lagos</p>
-                </div>
-                <div className="p-4 bg-blue-50 rounded-lg">
-                    <span className="text-4xl">☁️</span>
-                    <h4 className="font-bold mt-2 text-blue-900 font-display">Gaseoso</h4>
-                    <p className="text-sm text-blue-700">Vapor de agua en la Atmósfera</p>
+                <div>
+                    <h2 class="text-3xl font-bold text-purple-900 mb-2">Laboratorio de Ciencias</h2>
+                    <p class="text-purple-800">La ciencia se aprende haciendo. Aquí tienes 4 experimentos para realizar en clase o en casa.</p>
                 </div>
             </div>
-        </div>
 
-        <ImageBox 
-            id="img-hidrosfera-ciclo" 
-            label="Diagrama del Ciclo del Agua" 
-            currentUrl="https://educativo.ign.es/atlas-didactico/agua-eso/05_02_agua_eso_cicloagua.jpg"
-        />
-    </div>
-);
-
-// SECCIÓN: ATMÓSFERA
-const AtmosphereSection = () => (
-    <div className="space-y-8 animate-fade-in font-sans">
-        <div className="bg-sky-50 p-6 rounded-2xl border-2 border-sky-200">
-            <h2 className="text-3xl font-bold text-sky-900 mb-2 font-display">La Atmósfera: Nuestro Escudo</h2>
-            <p className="text-sky-800">Una capa de gases que nos protege de la radiación solar y los meteoritos, y mantiene la temperatura estable.</p>
-        </div>
-
-        <div className="flex flex-col gap-2 max-w-2xl mx-auto my-8 border-l-4 border-dashed border-sky-300 pl-8 relative">
-            {/* Visual Layer Stack */}
-            <div className="absolute left-[-22px] top-0 bottom-0 flex flex-col items-center justify-between text-xs font-bold text-sky-400 font-display">
-                <span>10.000km</span>
-                <span>0km</span>
-            </div>
-
-            {[
-                { name: 'Exosfera', desc: 'El límite con el espacio exterior. Satélites orbitando.', color: 'bg-slate-900 text-white' },
-                { name: 'Termosfera', desc: '¡Mucho calor! Aquí ocurren las auroras boreales.', color: 'bg-indigo-900 text-white' },
-                { name: 'Mesosfera', desc: 'La capa más fría. Aquí se desintegran los meteoritos (estrellas fugaces).', color: 'bg-blue-700 text-white' },
-                { name: 'Estratosfera', desc: 'Contiene la Capa de Ozono que nos protege de los rayos UV.', color: 'bg-sky-500 text-white' },
-                { name: 'Troposfera', desc: 'Donde vivimos y suceden los fenómenos meteorológicos (lluvia, viento).', color: 'bg-sky-300 text-slate-800' },
-            ].map((layer, idx) => (
-                <div key={idx} className={`${layer.color} p-4 rounded-lg shadow-sm hover:scale-105 transition-transform cursor-default group`}>
-                    <h4 className="font-bold text-lg font-display">{layer.name}</h4>
-                    <p className="text-sm opacity-90">{layer.desc}</p>
-                </div>
-            ))}
-        </div>
-
-        <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-green-50 p-6 rounded-xl border border-green-200">
-                <h3 className="font-bold text-green-800 text-xl mb-2 font-display">La Composición del Aire</h3>
-                <p className="mb-4 text-slate-700">El aire no es solo oxígeno. De hecho, ¡es sobre todo nitrógeno!</p>
-                <ul className="list-disc list-inside space-y-2 text-slate-700">
-                    <li><strong>78% Nitrógeno</strong> (Gas inerte)</li>
-                    <li><strong>21% Oxígeno</strong> (Lo que respiramos)</li>
-                    <li><strong>1% Otros</strong> (Argón, CO2, Vapor de agua...)</li>
-                </ul>
-            </div>
-            <ImageBox 
-                id="img-atmosfera-capas" 
-                label="Gráfico detallado de las capas atmosféricas" 
-                currentUrl="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/ird/atmosfera.png"
-            />
-        </div>
-    </div>
-);
-
-// SECCIÓN: MINIPROYECTOS
-const ProjectsSection = () => (
-    <div className="space-y-8 animate-fade-in font-sans">
-        <div className="bg-purple-50 p-6 rounded-2xl border-2 border-purple-200">
-            <h2 className="text-3xl font-bold text-purple-900 mb-2 font-display">Laboratorio de Ciencias</h2>
-            <p className="text-purple-800">¡Manos a la obra! 4 Experimentos para comprender cómo funciona nuestro planeta.</p>
-        </div>
-
-        <div className="grid lg:grid-cols-2 gap-8">
-            {/* Proyecto 1: Sismógrafo */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 flex flex-col h-full">
-                <div className="bg-red-500 py-3 px-6 text-white font-bold flex justify-between font-display">
-                    <span>#1: Detectives Sísmicos</span>
-                    <Activity className="h-6 w-6" />
-                </div>
-                <div className="p-4 bg-black/5 flex flex-col gap-2">
-                    <iframe 
-                        className="w-full aspect-video rounded-lg shadow-sm"
-                        src="https://www.youtube-nocookie.com/embed/D6sY-DHbCPE" 
-                        title="Cómo hacer un sismógrafo casero"
-                        frameBorder="0"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowFullScreen>
-                    </iframe>
-                    <a href="https://youtu.be/D6sY-DHbCPE" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 flex items-center justify-center gap-1 hover:underline">
-                        <ExternalLink className="h-3 w-3" /> Si el vídeo no carga, haz clic aquí
-                    </a>
-                </div>
-                <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-slate-800 mb-2 font-display">Construye tu propio Sismógrafo</h3>
-                    <div className="bg-slate-50 p-4 rounded-lg text-sm space-y-4 mb-4 flex-grow">
-                        <div>
-                            <p className="font-bold text-slate-700 mb-1">🛠️ Materiales:</p>
-                            <p className="text-slate-600">Base de cartón (15x27cm), lata de refresco, rollo de papel (o tiras pegadas), corchos, alambre/palito, rotulador, vaso pesado.</p>
-                        </div>
-                        <div>
-                            <p className="font-bold text-slate-700 mb-1">📋 Procedimiento:</p>
-                            <ol className="list-decimal list-inside text-slate-600 space-y-1">
-                                <li><strong>El Registro:</strong> Crea un soporte con la lata para que el rollo de papel pueda girar y desenrollarse sobre la base de cartón.</li>
-                                <li><strong>El Péndulo:</strong> Construye una estructura alta. Cuelga de ella un vaso con peso (piedras) mediante una cuerda.</li>
-                                <li><strong>El Marcador:</strong> Pega el rotulador al vaso de forma que la punta roce suavemente el papel.</li>
-                                <li><strong>Acción:</strong> Mientras un compañero tira del papel suavemente, otro golpea la mesa ("terremoto"). ¡La inercia hará que el rotulador dibuje las ondas!</li>
-                            </ol>
+            <div class="grid lg:grid-cols-2 gap-8">
+                
+                <!-- PROYECTO 1: SISMÓGRAFO -->
+                <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full">
+                    <div class="bg-red-500 p-4 text-white font-bold flex justify-between items-center">
+                        <span class="flex items-center gap-2"><i data-lucide="activity"></i> #1 Detectives Sísmicos</span>
+                    </div>
+                    <!-- Video Embed -->
+                    <div class="aspect-video w-full bg-black relative">
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube-nocookie.com/embed/D6sY-DHbCPE" title="Sismógrafo Casero" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col">
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">Construye tu Sismógrafo</h3>
+                        <p class="text-sm text-slate-600 mb-4">Un sismógrafo registra el movimiento del suelo. Como no podemos bajar al núcleo, usamos las ondas sísmicas para "ver" el interior.</p>
+                        <div class="bg-red-50 p-3 rounded text-xs text-red-800 mt-auto">
+                            <strong>Materiales:</strong> Caja de zapatos, lata/rollo de papel, cuerda, peso (piedras), rotulador.
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Proyecto 2: Maqueta de Pliegues */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 flex flex-col h-full">
-                <div className="bg-amber-600 py-3 px-6 text-white font-bold flex justify-between font-display">
-                    <span>#2: Maqueta de Montañas</span>
-                    <Mountain className="h-6 w-6" />
-                </div>
-                <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-slate-800 mb-2 font-display">Fábrica de Pliegues</h3>
-                    <div className="bg-slate-50 p-4 rounded-lg text-sm space-y-4 mb-4 flex-grow">
-                        <div>
-                            <p className="font-bold text-slate-700 mb-1">🛠️ Materiales:</p>
-                            <p className="text-slate-600">Plastilina de 3 colores diferentes (o toallas de colores), hilo de coser (para cortar).</p>
-                        </div>
-                        <div>
-                            <p className="font-bold text-slate-700 mb-1">📋 Procedimiento:</p>
-                            <ol className="list-decimal list-inside text-slate-600 space-y-1">
-                                <li><strong>Estratos:</strong> Aplana la plastilina y crea 3 láminas rectangulares de igual tamaño pero distinto color.</li>
-                                <li><strong>Sedimentación:</strong> Coloca las láminas una encima de otra. Tienes 3 estratos geológicos.</li>
-                                <li><strong>Orogénesis:</strong> Empuja suavemente los dos extremos hacia el centro. ¡Las capas se doblarán!</li>
-                                <li><strong>Análisis:</strong> Si la curva va hacia arriba (como una A) es un <strong>Anticlinal</strong>. Si va hacia abajo (como una U) es un <strong>Sinclinal</strong>.</li>
-                                <li><strong>Corte Geológico:</strong> Usa el hilo para cortar el bloque por la mitad y ver el interior.</li>
-                            </ol>
+                <!-- PROYECTO 2: NUBE EN BOTELLA -->
+                <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full">
+                    <div class="bg-sky-500 p-4 text-white font-bold flex justify-between items-center">
+                        <span class="flex items-center gap-2"><i data-lucide="cloud"></i> #2 Nube en un Tarro</span>
+                    </div>
+                    <!-- Video Embed -->
+                    <div class="aspect-video w-full bg-black relative">
+                        <iframe class="w-full h-full absolute inset-0" src="https://www.youtube-nocookie.com/embed/OmFmx8WY3Ts" title="Nube en una botella" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                    <div class="p-6 flex-grow flex flex-col">
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">Condensación Instantánea</h3>
+                        <p class="text-sm text-slate-600 mb-4">Para formar una nube necesitas tres cosas: vapor de agua, enfriamiento y núcleos de condensación (humo).</p>
+                        <div class="bg-sky-50 p-3 rounded text-xs text-sky-800 mt-auto">
+                            <strong>Materiales:</strong> Tarro de cristal, agua caliente, hielos (en la tapa), cerillas (con ayuda adulta).
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Proyecto 3: Nube en Botella */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 flex flex-col h-full">
-                <div className="bg-sky-500 py-3 px-6 text-white font-bold flex justify-between font-display">
-                    <span>#3: Creador de Nubes</span>
-                    <Cloud className="h-6 w-6" />
-                </div>
-                <div className="p-4 bg-black/5 flex flex-col gap-2">
-                    <iframe 
-                        className="w-full aspect-video rounded-lg shadow-sm"
-                        src="https://www.youtube-nocookie.com/embed/OmFmx8WY3Ts" 
-                        title="Cómo hacer una nube en una botella"
-                        frameBorder="0"
-                        referrerPolicy="strict-origin-when-cross-origin"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                        allowFullScreen>
-                    </iframe>
-                    <a href="https://youtu.be/OmFmx8WY3Ts" target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 flex items-center justify-center gap-1 hover:underline">
-                        <ExternalLink className="h-3 w-3" /> Si el vídeo no carga, haz clic aquí
-                    </a>
-                </div>
-                <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-slate-800 mb-2 font-display">Nube atrapada en un Tarro</h3>
-                    <div className="bg-slate-50 p-4 rounded-lg text-sm space-y-4 mb-4 flex-grow">
-                        <div>
-                            <p className="font-bold text-slate-700 mb-1">🛠️ Materiales:</p>
-                            <p className="text-slate-600">Tarro de cristal con tapa, agua caliente, hielos, cerillas/fósforos (¡con supervisión!), laca de pelo (opcional).</p>
+                <!-- PROYECTO 3: PLIEGUES -->
+                <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full">
+                    <div class="bg-amber-600 p-4 text-white font-bold flex justify-between items-center">
+                        <span class="flex items-center gap-2"><i data-lucide="mountain"></i> #3 Fábrica de Montañas</span>
+                    </div>
+                    <div class="p-6 flex-grow">
+                        <div class="flex justify-center mb-4 text-amber-200 bg-amber-800 rounded-lg py-4">
+                            <i data-lucide="layers" class="h-16 w-16"></i>
                         </div>
-                        <div>
-                            <p className="font-bold text-slate-700 mb-1">📋 Procedimiento:</p>
-                            <ol className="list-decimal list-inside text-slate-600 space-y-1">
-                                <li><strong>Vapor:</strong> Vierte 2cm de agua muy caliente en el tarro para llenarlo de vapor.</li>
-                                <li><strong>Frío:</strong> Pon la tapa boca abajo sobre el tarro y coloca varios cubitos de hielo encima.</li>
-                                <li><strong>Núcleos:</strong> Enciende una cerilla, apágala y mete el humo dentro del tarro (o echa un spray de laca). Tapa rápido con los hielos.</li>
-                                <li><strong>Resultado:</strong> El aire caliente sube, el hielo lo enfría y el humo ayuda a condensar el agua. ¡Verás formarse una nube blanca!</li>
-                            </ol>
-                        </div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">Maqueta de Pliegues</h3>
+                        <p class="text-sm text-slate-600 mb-4">Simula las fuerzas orogénicas (formadoras de montañas) usando materiales blandos.</p>
+                        <ul class="list-decimal list-inside text-sm text-slate-700 space-y-2">
+                            <li>Crea láminas planas de plastilina de 3 colores (estratos).</li>
+                            <li>Apílalas una sobre otra.</li>
+                            <li>Empuja suavemente los extremos hacia el centro.</li>
+                            <li><strong>Resultado:</strong> ¡Tus propias montañas plegadas!</li>
+                        </ul>
                     </div>
                 </div>
-            </div>
 
-            {/* Proyecto 4: Filtro de Agua */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-200 flex flex-col h-full">
-                <div className="bg-blue-600 py-3 px-6 text-white font-bold flex justify-between font-display">
-                    <span>#4: Agua Limpia</span>
-                    <Filter className="h-6 w-6" />
-                </div>
-                <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-slate-800 mb-2 font-display">Depuradora Casera</h3>
-                    <div className="bg-slate-50 p-4 rounded-lg text-sm space-y-4 mb-4 flex-grow">
-                        <div>
-                            <p className="font-bold text-slate-700 mb-1">🛠️ Materiales:</p>
-                            <p className="text-slate-600">Botella de plástico grande, algodón, piedras medianas, grava pequeña, arena fina, carbón activo (opcional), agua sucia (con tierra).</p>
+                <!-- PROYECTO 4: FILTRO AGUA -->
+                <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full">
+                    <div class="bg-blue-600 p-4 text-white font-bold flex justify-between items-center">
+                        <span class="flex items-center gap-2"><i data-lucide="filter"></i> #4 Agua Limpia</span>
+                    </div>
+                    <div class="p-6 flex-grow">
+                        <div class="flex justify-center mb-4 text-blue-200 bg-blue-800 rounded-lg py-4">
+                            <i data-lucide="droplet" class="h-16 w-16"></i>
                         </div>
-                        <div>
-                            <p className="font-bold text-slate-700 mb-1">📋 Procedimiento:</p>
-                            <ol className="list-decimal list-inside text-slate-600 space-y-1">
-                                <li><strong>Preparación:</strong> Corta la base de la botella y ponla boca abajo (como un embudo).</li>
-                                <li><strong>Capas Filtrantes (de abajo a arriba):</strong>
-                                    <ul className="list-disc list-inside ml-4 mt-1 text-slate-500">
-                                        <li>Tapón: Algodón prensado.</li>
-                                        <li>Fondo: Piedras medianas.</li>
-                                        <li>Medio: Grava pequeña.</li>
-                                        <li>Tope: Arena fina (y carbón si tienes).</li>
-                                    </ul>
-                                </li>
-                                <li><strong>Prueba:</strong> Echa el agua sucia por arriba. La tierra se quedará atrapada en las capas y el agua saldrá mucho más limpia por el algodón.</li>
-                            </ol>
-                        </div>
+                        <h3 class="font-bold text-lg mb-2 text-slate-800">Depuradora Casera</h3>
+                        <p class="text-sm text-slate-600 mb-4">Entiende cómo el suelo filtra el agua de lluvia hasta los acuíferos.</p>
+                        <ul class="list-disc list-inside text-sm text-slate-700 space-y-2">
+                            <li>Corta una botella y pon la parte superior boca abajo (embudo).</li>
+                            <li><strong>Capas (abajo a arriba):</strong> Algodón, Piedras, Grava, Arena.</li>
+                            <li>Echa agua con tierra por arriba y observa cómo sale.</li>
+                        </ul>
                     </div>
                 </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- === FOOTER === -->
+    <footer class="bg-slate-900 text-slate-400 py-8 text-center mt-8 border-t-4 border-green-500">
+        <div class="max-w-4xl mx-auto px-4">
+            <p class="mb-2 font-bold text-slate-200 text-lg">Ciencias Naturales - 1º ESO</p>
+            <p class="text-sm italic font-serif">"La Tierra es lo único que todos tenemos en común." - Wendell Berry</p>
+            <div class="flex justify-center gap-4 mt-6">
+                <div class="h-3 w-3 rounded-full bg-blue-500"></div>
+                <div class="h-3 w-3 rounded-full bg-green-500"></div>
+                <div class="h-3 w-3 rounded-full bg-white"></div>
             </div>
         </div>
-    </div>
-);
+    </footer>
 
-// Componente Principal
-export default function App() {
-    const [activeSection, setActiveSection] = useState('home');
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    <!-- === JAVASCRIPT === -->
+    <script>
+        // 1. Inicializar iconos de Lucide
+        lucide.createIcons();
 
-    const renderSection = () => {
-        switch(activeSection) {
-            case 'home': return <HomeSection />;
-            case 'geosphere': return <GeosphereSection />;
-            case 'hydrosphere': return <HydrosphereSection />;
-            case 'atmosphere': return <AtmosphereSection />;
-            case 'projects': return <ProjectsSection />;
-            default: return <HomeSection />;
+        // 2. Función de Navegación (SPA)
+        function showSection(sectionId) {
+            // Ocultar todas las secciones
+            const sections = document.querySelectorAll('.section-content');
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Mostrar la sección deseada
+            const activeSection = document.getElementById(sectionId);
+            if (activeSection) {
+                activeSection.classList.add('active');
+                // Scroll suave al inicio
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+
+            // Cerrar menú móvil si está abierto
+            document.getElementById('mobile-menu').classList.add('hidden');
         }
-    };
 
-    return (
-        <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
-            <CustomStyles />
-            <Navigation 
-                activeSection={activeSection} 
-                setActiveSection={setActiveSection}
-                toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
-                isMenuOpen={isMenuOpen}
-            />
+        // 3. Toggle Menú Móvil
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
 
-            <main className="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
-                {renderSection()}
-            </main>
+        // 4. Lógica del Diagrama de Capas (Geosfera)
+        function updateLayerInfo(layer) {
+            const panel = document.getElementById('layer-info-panel');
+            
+            // Datos de las capas
+            const data = {
+                'corteza': {
+                    title: 'La Corteza',
+                    text: 'Es la "piel" de la Tierra. Sólida y rocosa. Ocupa menos del 1% del volumen. Hay dos tipos: Continental (granito) y Oceánica (basalto).',
+                    color: 'bg-amber-50 border-amber-200 text-amber-900'
+                },
+                'manto': {
+                    title: 'El Manto',
+                    text: 'La capa más gruesa (84%). Son rocas muy calientes, sólidas pero plásticas (como plastilina dura). Sus movimientos lentos mueven los continentes.',
+                    color: 'bg-orange-50 border-orange-200 text-orange-900'
+                },
+                'externo': {
+                    title: 'Núcleo Externo',
+                    text: 'Metal fundido (LÍQUIDO). Compuesto de hierro y níquel a 4000-5000°C. Al girar, funciona como una dinamo gigante creando el campo magnético.',
+                    color: 'bg-red-50 border-red-200 text-red-900'
+                },
+                'interno': {
+                    title: 'Núcleo Interno',
+                    text: 'El corazón de la Tierra. Una bola de hierro SÓLIDO debido a la presión extrema, aunque está a 6000°C (¡como la superficie del Sol!).',
+                    color: 'bg-yellow-50 border-yellow-200 text-yellow-900'
+                }
+            };
 
-            <footer className="bg-slate-900 text-slate-400 py-8 text-center mt-8 border-t-4 border-green-500 font-display">
-                <div className="max-w-4xl mx-auto px-4">
-                    <p className="mb-2 font-bold text-slate-200">Ciencias Naturales - 1º ESO</p>
-                    <p className="text-sm">
-                        "La Tierra es lo único que todos tenemos en común." - Wendell Berry
-                    </p>
-                    <div className="flex justify-center gap-4 mt-4">
-                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                        <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                        <div className="h-2 w-2 rounded-full bg-white"></div>
-                    </div>
-                </div>
-            </footer>
-        </div>
-    );
-}
+            const info = data[layer];
+            
+            // Actualizar contenido con animación simple
+            panel.style.opacity = '0';
+            setTimeout(() => {
+                panel.className = `p-8 rounded-xl shadow-md border flex flex-col justify-center min-h-[250px] transition-all duration-300 ${info.color}`;
+                panel.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-3">${info.title}</h3>
+                    <p class="text-lg leading-relaxed">${info.text}</p>
+                `;
+                panel.style.opacity = '1';
+            }, 200);
+        }
+    </script>
+</body>
+</html>
