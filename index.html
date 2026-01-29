@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encyclopedia Terra: Estructura e Historia de la Tierra</title>
+    <!-- Fuentes científicas y modernas -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- VARIABLES DE COLOR (TEMA TIERRA) --- */
+        :root {
+            --atmosphere: #87CEEB; /* Azul Atmósfera */
+            --ocean: #1a535c;      /* Azul Profundo Oceánico */
+            --land: #4a6c42;       /* Verde Tierra */
+            --mantle: #d35400;     /* Naranja Magma */
+            --core: #922b21;       /* Rojo Núcleo */
+            --text-light: #ecf0f1;
+            --text-dark: #2c3e50;
+            --bg-dark: #121212;
+            --accent: #f1c40f;     /* Amarillo Mineral */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+
+        /* --- NAVEGACIÓN STICKY --- */
+        #navbar {
+            position: sticky;
+            top: 0;
+            background: rgba(26, 83, 92, 0.95); /* Semi-transparente */
+            backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .logo {
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo span { color: var(--atmosphere); }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            transition: color 0.3s, border-bottom 0.3s;
+            padding-bottom: 5px;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-links li a:hover {
+            color: var(--atmosphere);
+            border-bottom: 2px solid var(--atmosphere);
+        }
+
+        /* Menú hamburguesa para móvil */
+        .burger {
+            display: none;
+            cursor: pointer;
+        }
+        .burger div {
+            width: 25px;
+            height: 3px;
+            background-color: white;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        /* --- HERO HEADER --- */
+        .hero {
+            height: 85vh;
+            /* Gradiente simulando el espacio y la atmósfera */
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Círculo decorativo representando la Tierra */
+        .hero::after {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle at 30% 30%, #4a6c42, #1a535c);
+            border-radius: 50%;
+            opacity: 0.3;
+            z-index: 0;
+            filter: blur(60px);
+        }
+
+        .hero-content {
+            z-index: 1;
+            padding: 20px;
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .btn-explore {
+            padding: 12px 35px;
+            background: var(--mantle); /* Naranja magma */
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+            box-shadow: 0 4px 15px rgba(211, 84, 0, 0.4);
+        }
+
+        .btn-explore:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(211, 84, 0, 0.6);
+            background: #e67e22;
+        }
+
+        /* --- UTILIDADES DE LAYOUT --- */
+        .section-container {
+            padding: 5rem 10%;
+        }
+
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            color: var(--ocean);
+            position: relative;
+        }
+        
+        h2::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--mantle);
+            margin: 10px auto 0;
+            border-radius: 2px;
+        }
+
+        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 40px; }
+
+        /* --- ESTILOS PARA IMÁGENES REALES (NUEVO) --- */
+        .content-image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .content-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
+        }
+
+        .content-image:hover {
+            transform: scale(1.01);
+        }
+
+        /* --- TARJETAS --- */
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-top: 5px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+
+        /* Colores específicos para esferas */
+        .sphere-card:nth-child(1) { border-color: var(--mantle); } /* Geosfera */
+        .sphere-card:nth-child(2) { border-color: var(--ocean); } /* Hidrosfera */
+        .sphere-card:nth-child(3) { border-color: var(--atmosphere); } /* Atmosfera */
+        .sphere-card:nth-child(4) { border-color: var(--land); } /* Biosfera */
+        
+        .sphere-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
+
+        /* --- SECCIÓN GRADIENTE GEOSFERA --- */
+        /* Gradiente visual que va de la superficie (fría) al núcleo (caliente) */
+        .layer-gradient {
+            background: linear-gradient(180deg, #f0f8ff 0%, #e8f6f3 10%, #fdebd0 40%, #f5b7b1 70%, #d98880 100%);
+            padding-top: 3rem;
+            padding-bottom: 3rem;
+            border-radius: 20px;
+            margin: 2rem 5%;
+        }
+
+        .layer-title { color: #2c3e50; }
+
+        .layer-accordion {
+            background: rgba(255,255,255,0.95);
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .layer-accordion summary {
+            padding: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .layer-accordion summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        
+        .layer-accordion[open] summary::after {
+            transform: rotate(45deg);
+        }
+
+        .layer-content {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            background: #fafafa;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        /* Estilos específicos de capas */
+        .crust summary { border-left: 8px solid var(--land); color: var(--land); }
+        .mantle summary { border-left: 8px solid #e67e22; color: #e67e22; }
+        .outer-core summary { border-left: 8px solid #c0392b; color: #c0392b; }
+        .inner-core summary { border-left: 8px solid #922b21; color: #922b21; }
+
+        .temp-badge {
+            display: inline-block;
+            background: #2c3e50;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        /* --- SISMOLOGÍA (Efecto Vibración) --- */
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(3px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(1px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .wave-card {
+            background: #34495e;
+            color: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 5px solid var(--accent);
+            cursor: default;
+        }
+
+        .wave-card:hover {
+            animation: shake 0.5s; /* Efecto de vibración al pasar el mouse */
+            background: #2c3e50;
+        }
+        
+        .wave-card h4 { margin-bottom: 5px; color: var(--accent); }
+
+        .timeline-list {
+            list-style: none;
+            position: relative;
+        }
+        
+        .timeline-list li {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            border-left: 2px solid var(--mantle);
+            position: relative;
+        }
+        
+        .timeline-list li::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 5px;
+            width: 10px;
+            height: 10px;
+            background: var(--mantle);
+            border-radius: 50%;
+        }
+
+        .depth {
+            display: block;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            font-weight: bold;
+        }
+
+        /* --- TABS GEODINÁMICA --- */
+        .tabs-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .tabs { 
+            display: flex; 
+            border-bottom: 1px solid #eee;
+            background: #f8f9fa;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 20px;
+            cursor: pointer;
+            background: transparent;
+            border: none;
+            font-weight: bold;
+            font-family: 'Montserrat', sans-serif;
+            color: #7f8c8d;
+            transition: all 0.3s;
+        }
+        
+        .tab-btn:hover { background: #eee; }
+        
+        .tab-btn.active { 
+            background: white; 
+            color: var(--ocean); 
+            border-bottom: 3px solid var(--ocean);
+        }
+        
+        .tab-content { 
+            display: none; 
+            padding: 40px; 
+        }
+        
+        .tab-content.active-content { 
+            display: block; 
+            animation: fadeIn 0.5s; 
+        }
+
+        /* --- MATERIALES (DARK MODE) --- */
+        .dark-theme {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            border-radius: 20px;
+            margin: 2rem 5%;
+        }
+        
+        .dark-theme h2 { color: var(--accent); }
+        .dark-theme p { color: #bdc3c7; }
+
+        /* Estilos nuevos para los acordeones de rocas */
+        .rock-accordion {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: background 0.3s;
+        }
+        .rock-accordion:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .rock-accordion summary {
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .rock-accordion summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            transition: transform 0.3s;
+        }
+        .rock-accordion[open] summary::after {
+            transform: rotate(45deg);
+        }
+        .rock-content {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.95rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .rock-content ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        .rock-content li {
+            margin-bottom: 8px;
+        }
+
+        /* Colores específicos para títulos de rocas en acordeón */
+        .magma summary { color: #e74c3c; border-left: 5px solid #e74c3c; }
+        .sediment summary { color: #f39c12; border-left: 5px solid #f39c12; }
+        .meta summary { color: #9b59b6; border-left: 5px solid #9b59b6; }
+
+        .mineral-scroll {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) #2c3e50;
+        }
+        
+        .mineral-card {
+            min-width: 250px;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .mineral-card strong { color: var(--accent); display: block; margin-bottom: 5px; font-size: 1.1rem; }
+
+        /* --- HISTORIA TIMELINE --- */
+        .history-timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .history-timeline::after {
+            content: '';
+            position: absolute;
+            width: 4px;
+            background-color: var(--ocean);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -2px;
+            border-radius: 2px;
+        }
+        
+        .history-card {
+            padding: 20px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            box-sizing: border-box;
+        }
+        
+        .history-card::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: white;
+            border: 4px solid var(--ocean);
+            top: 25px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+        
+        .left { left: 0; text-align: right;}
+        .right { left: 50%; }
+        .left::after { right: -14px; }
+        .right::after { left: -14px; }
+        
+        .history-content {
+            padding: 20px;
+            background-color: white;
+            position: relative;
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        /* --- HIDROSFERA --- */
+        .water-theme {
+            background: linear-gradient(to right, #eaf2f8, #d4e6f1);
+            border-radius: 20px;
+            margin: 2rem 5%;
+        }
+
+        .water-cycle-diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .cycle-step {
+            margin: 10px 0;
+            padding: 10px 20px;
+            background: var(--atmosphere);
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+            width: 80%;
+        }
+        
+        .cycle-arrow { font-size: 20px; color: var(--ocean); }
+
+        /* Footer */
+        footer {
+            background: var(--bg-dark);
+            color: white;
+            text-align: center;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        /* ANIMACIONES */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* MEDIA QUERIES */
+        @media screen and (max-width: 768px) {
+            .nav-links { display: none; }
+            .burger { display: block; } /* Mostrar menú móvil */
+            .hero h1 { font-size: 2.2rem; }
+            .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+            
+            .history-timeline::after { left: 31px; }
+            .history-card { width: 100%; padding-left: 70px; padding-right: 25px; }
+            .history-card::after { left: 21px; }
+            .left::after { left: 21px; }
+            .left { text-align: left; }
+            .right { left: 0%; }
+            
+            .section-container { padding: 3rem 5%; }
+            .tabs { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVEGACIÓN -->
+    <nav id="navbar">
+        <div class="logo">GEO<span>ENCYCLOPEDIA</span></div>
+        <ul class="nav-links">
+            <li><a href="#esferas">Esferas</a></li>
+            <li><a href="#geosfera">Geosfera</a></li>
+            <li><a href="#sismologia">Sismología</a></li>
+            <li><a href="#dinamica">Geodinámica</a></li>
+            <li><a href="#materiales">Materiales</a></li>
+            <li><a href="#historia">Historia</a></li>
+            <li><a href="#hidrosfera">Hidrosfera</a></li>
+        </ul>
+        <div class="burger">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </nav>
+
+    <!-- HEADER HERO -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1>LA TIERRA</h1>
+            <p>Estructura, Materiales e Historia. Un viaje interactivo desde la Atmósfera hasta el Núcleo Interno.</p>
+            <a href="#esferas" class="btn-explore">Comenzar Exploración</a>
+        </div>
+    </header>
+
+    <main>
+        <!-- 1. ESFERAS -->
+        <section id="esferas" class="section-container">
+            <h2>Las Cuatro Esferas</h2>
+            
+            <!-- IMAGEN 1: ESFERAS -->
+            <div class="content-image-container">
+                <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/main/esferas.png" alt="Esferas de la Tierra" class="content-image">
+            </div>
+
+            <div class="grid-4">
+                <div class="card sphere-card">
+                    <h3>Geosfera</h3>
+                    <p>La parte sólida: roca, metales y minerales que forman la estructura base.</p>
+                </div>
+                <div class="card sphere-card">
+                    <h3>Hidrosfera</h3>
+                    <p>El agua: océanos, glaciares, aguas subterráneas y superficiales.</p>
+                </div>
+                <div class="card sphere-card">
+                    <h3>Atmósfera</h3>
+                    <p>La parte gaseosa que envuelve al planeta y permite la vida.</p>
+                </div>
+                <div class="card sphere-card">
+                    <h3>Biosfera</h3>
+                    <p>El conjunto de todos los seres vivos que habitan el planeta.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. GEOSFERA Y ESTRUCTURA -->
+        <section id="geosfera" class="section-container">
+            <h2>Estructura Interna de la Tierra</h2>
+            <p style="text-align: center; max-width: 700px; margin: 0 auto 2rem;">
+                Basado en datos sismológicos, la Tierra se organiza en capas por densidad y temperatura.
+            </p>
+
+            <div class="layer-gradient">
+                <div style="max-width: 800px; margin: 0 auto; padding: 0 20px;">
+                    
+                    <!-- IMAGEN 2: CAPAS -->
+                    <div class="content-image-container">
+                        <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/main/capas.png" alt="Capas de la Tierra" class="content-image">
+                    </div>
+
+                    <!-- Corteza -->
+                    <details class="layer-accordion crust">
+                        <summary>
+                            <span>1. Corteza (0 - 70 km)</span>
+                            <span class="temp-badge">-40°C a 1000°C</span>
+                        </summary>
+                        <div class="layer-content">
+                            <p>Capa sólida y fría. Contiene todos los elementos químicos de la Tierra.</p>
+                            <ul>
+                                <li><strong>Oceánica:</strong> Delgada (aprox. 7 km).</li>
+                                <li><strong>Continental:</strong> Gruesa (hasta 35-70 km).</li>
+                            </ul>
+                        </div>
+                    </details>
+
+                    <!-- Manto Superior -->
+                    <details class="layer-accordion mantle">
+                        <summary>
+                            <span>2. Manto Superior (~600 km)</span>
+                            <span class="temp-badge">~1000°C</span>
+                        </summary>
+                        <div class="layer-content">
+                            <p>Sólido pero flexible (plástico, tipo puré) debido a menor presión. Contiene todos los elementos terrestres.</p>
+                        </div>
+                    </details>
+
+                    <!-- Manto Inferior -->
+                    <details class="layer-accordion mantle">
+                        <summary>
+                            <span>3. Manto Inferior (2200 km)</span>
+                            <span class="temp-badge">1727°C (2000K)</span>
+                        </summary>
+                        <div class="layer-content">
+                            <p><strong>Mesosfera:</strong> Muy caliente y con presión alta. Es sólido. Aquí ocurren las corrientes de convección.</p>
+                            <div style="background:#fff3e0; padding:10px; margin-top:10px; border-left:4px solid #e67e22;">
+                                <strong>Capa D' (Doble Prima):</strong> Zona de transición con el núcleo. Genera penachos térmicos (puntos calientes) y ayuda a frenar/remover el núcleo externo.
+                            </div>
+                        </div>
+                    </details>
+
+                    <!-- Núcleo Externo -->
+                    <details class="layer-accordion outer-core">
+                        <summary>
+                            <span>4. Núcleo Externo (2200 km)</span>
+                            <span class="temp-badge">3727°C (4000K)</span>
+                        </summary>
+                        <div class="layer-content">
+                            <p>Composición: Níquel y Hierro. <strong>Estado: Líquido</strong> (menos presión que el interior).</p>
+                            <p><strong>Función Vital:</strong> Su movimiento genera el <strong>Campo Magnético</strong> de la Tierra.</p>
+                        </div>
+                    </details>
+
+                    <!-- Núcleo Interno -->
+                    <details class="layer-accordion inner-core">
+                        <summary>
+                            <span>5. Núcleo Interno (1200 km)</span>
+                            <span class="temp-badge">5727°C (6000K)</span>
+                        </summary>
+                        <div class="layer-content">
+                            <p>Composición: Níquel y Hierro. <strong>Estado: Sólido</strong> debido a la inmensa presión de todo el peso del planeta, a pesar de su temperatura extrema.</p>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SISMOLOGÍA -->
+        <section id="sismologia" class="section-container">
+            <h2>Sismología y Discontinuidades</h2>
+            
+            <!-- IMAGEN 3: ONDAS -->
+            <div class="content-image-container">
+                <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/main/ondas.png" alt="Ondas Sísmicas" class="content-image">
+            </div>
+
+            <div class="grid-2">
+                <div>
+                    <h3 style="margin-bottom: 1.5rem;">Ondas Sísmicas (Vibra al pasar el ratón)</h3>
+                    <div class="wave-card">
+                        <h4>Ondas P (Primarias)</h4>
+                        <p>Longitudinales. Las más rápidas. Atraviesan sólidos y se ralentizan en líquidos.</p>
+                    </div>
+                    <div class="wave-card" style="border-color: #e74c3c;">
+                        <h4>Ondas S (Secundarias)</h4>
+                        <p>Transversales. Más lentas. <strong>Desaparecen en líquidos</strong> (confirmación de que el núcleo externo es líquido).</p>
+                    </div>
+                    <div class="wave-card" style="border-color: #95a5a6;">
+                        <h4>Ondas Superficiales</h4>
+                        <p><strong>Love:</strong> Transversales y destructivas. <br><strong>Rayleigh:</strong> Movimiento elíptico (redondo).</p>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="margin-bottom: 1.5rem;">Las Discontinuidades</h3>
+                    <p>Fronteras donde cambia bruscamente la velocidad de las ondas.</p>
+                    <ul class="timeline-list">
+                        <li>
+                            <span class="depth">8-70 km</span>
+                            <strong>MOHO (Mohorovicic):</strong> Corteza / Manto Superior.
+                        </li>
+                        <li>
+                            <span class="depth">670-1000 km</span>
+                            <strong>Repetti:</strong> Manto Superior / Inferior.
+                        </li>
+                        <li>
+                            <span class="depth">2900 km</span>
+                            <strong>Gutenberg:</strong> Manto Inferior / Núcleo Externo. (Aquí desaparecen las ondas S).
+                        </li>
+                        <li>
+                            <span class="depth">5100 km</span>
+                            <strong>Wiecher-Lehmann:</strong> Núcleo Externo / Interno. (La velocidad vuelve a subir al ser sólido).
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. GEODINÁMICA -->
+        <section id="dinamica" class="section-container">
+            <h2>Geodinámica Terrestre</h2>
+            
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="openTab(event, 'placas')">Tectónica de Placas</button>
+                    <button class="tab-btn" onclick="openTab(event, 'volcanes')">Volcanes</button>
+                    <button class="tab-btn" onclick="openTab(event, 'deformaciones')">Deformaciones</button>
+                </div>
+
+                <!-- Tab 1: Placas -->
+                <div id="placas" class="tab-content active-content">
+                    <h3>Movimientos de Placas (Ciclo de Wilson)</h3>
+                    
+                    <!-- IMAGEN 4: PLACAS -->
+                    <div class="content-image-container">
+                        <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/main/placas.png" alt="Placas Tectónicas" class="content-image">
+                    </div>
+
+                    <div class="grid-3">
+                        <div class="card">
+                            <h4>Divergentes</h4>
+                            <p>Las placas se separan. Se crea nueva corteza oceánica.</p>
+                            <small>Ej: Océano Atlántico, Mar Rojo.</small>
+                        </div>
+                        <div class="card">
+                            <h4>Convergentes</h4>
+                            <p>Las placas chocan. Se destruye corteza (subducción) o se forman cordilleras.</p>
+                            <small>Ej: Himalaya (C-C), Andes (O-C), Marianas (O-O).</small>
+                        </div>
+                        <div class="card">
+                            <h4>Transformantes</h4>
+                            <p>Desplazamiento lateral. Fricción intensa sin creación ni destrucción de roca.</p>
+                            <small>Ej: Falla de San Andrés.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Volcanes -->
+                <div id="volcanes" class="tab-content">
+                    <h3>Vulcanología</h3>
+                    
+                    <!-- IMAGEN 5: VOLCANES -->
+                    <div class="content-image-container">
+                        <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/main/volcanes.png" alt="Tipos de Volcanes" class="content-image">
+                    </div>
+
+                    <p>La lava es magma desgasificado al perder presión en superficie.</p>
+                    <ul style="margin-top:20px; padding-left:20px; line-height:2;">
+                        <li><strong>Hawaiano:</strong> Lava muy líquida, burbujas suaves, recorrido corto. Poca explosividad.</li>
+                        <li><strong>Estromboliano:</strong> Recorrido largo, lava más viscosa. Salpicaduras forman piroclastos.</li>
+                        <li><strong>Vulcaniano:</strong> Lava viscosa, grandes explosiones, nubes de fuego y gases tóxicos.</li>
+                        <li><strong>Pliniano:</strong> Extremadamente explosivo. Puede destruir la montaña entera.</li>
+                    </ul>
+                </div>
+
+                <!-- Tab 3: Deformaciones -->
+                <div id="deformaciones" class="tab-content">
+                    <h3>Pliegues y Fallas</h3>
+                    <div class="grid-2">
+                        <div>
+                            <h4>Pliegues (Deformación Plástica)</h4>
+                            <ul>
+                                <li><strong>Anticlinal:</strong> Forma de "A" (convexo).</li>
+                                <li><strong>Sinclinal:</strong> Forma de "U" (cóncavo).</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h4>Fallas (Rotura)</h4>
+                            <ul>
+                                <li><strong>Normal:</strong> Por estiramiento (un bloque cae).</li>
+                                <li><strong>Inversa:</strong> Por compresión (un bloque sube).</li>
+                                <li><strong>Desgarre:</strong> Movimiento horizontal.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. MATERIALES -->
+        <section id="materiales" class="section-container dark-theme">
+            <h2>Minerales y Rocas</h2>
+            
+            <h3 style="color:var(--accent); margin-bottom:1rem;">Minerales (Escala de Mohs)</h3>
+            <p style="margin-bottom:1rem;">Ordenados de menor (1) a mayor (10) dureza:</p>
+            
+            <div class="mineral-scroll">
+                <div class="mineral-card"><strong>1. Talco</strong>Se raya con la uña.</div>
+                <div class="mineral-card"><strong>2. Yeso</strong>Se raya con la uña.</div>
+                <div class="mineral-card"><strong>3. Calcita</strong>Se rompe con cobre.</div>
+                <div class="mineral-card"><strong>4. Fluorita</strong>Se rompe con vidrio.</div>
+                <div class="mineral-card"><strong>5. Apatita</strong>Se rompe con vidrio.</div>
+                <div class="mineral-card"><strong>6. Ortosa</strong>Rasga el vidrio.</div>
+                <div class="mineral-card"><strong>7. Cuarzo</strong>Rasga el vidrio.</div>
+                <div class="mineral-card"><strong>8. Topacio</strong>Rasga el vidrio.</div>
+                <div class="mineral-card"><strong>9. Corindón</strong>Rasga el vidrio.</div>
+                <div class="mineral-card"><strong>10. Diamante</strong>El material más duro.</div>
+            </div>
+
+            <br><hr style="border-color:rgba(255,255,255,0.1);"><br>
+
+            <h3 style="color:var(--accent); margin-bottom:1rem;">Tipos de Rocas</h3>
+            
+            <!-- IMAGEN 6: ROCAS -->
+            <div class="content-image-container">
+                <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/main/rocas.png" alt="Ciclo de las Rocas" class="content-image">
+            </div>
+
+            <div class="grid-3">
+                
+                <!-- Acordeón Magmáticas -->
+                <details class="rock-accordion magma">
+                    <summary>Magmáticas (Ígneas)</summary>
+                    <div class="rock-content">
+                        <p>Nacen directamente del enfriamiento del magma. Se clasifican según dónde se enfrían:</p>
+                        <ul>
+                            <li><strong>Volcánicas:</strong> El magma sale al exterior (lava) y se enfría rápidamente. No da tiempo a formar cristales visibles.
+                                <br><em>Ejemplos: Basalto, Pumita, Riolita.</em></li>
+                            <li><strong>Plutónicas:</strong> El magma se enfría lentamente en el interior (en batolitos). Se forman cristales grandes y visibles.
+                                <br><em>Ejemplos: Granito, Sienita.</em></li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- Acordeón Sedimentarias -->
+                <details class="rock-accordion sediment">
+                    <summary>Sedimentarias</summary>
+                    <div class="rock-content">
+                        <p>Formadas en la superficie terrestre por la acumulación de sedimentos:</p>
+                        <ul>
+                            <li><strong>Detríticas:</strong> Fragmentos de otras rocas unidos por un cemento natural.
+                                <br><em>Ejemplos: Conglomerados, Areniscas, Lutitas.</em></li>
+                            <li><strong>Químicas:</strong> Precipitación de sustancias disueltas en agua.
+                                <br><em>Ejemplos: Caliza, Yeso, Sales (Halita).</em></li>
+                        </ul>
+                    </div>
+                </details>
+
+                <!-- Acordeón Metamórficas -->
+                <details class="rock-accordion meta">
+                    <summary>Metamórficas</summary>
+                    <div class="rock-content">
+                        <p>Rocas transformadas por altas presiones y/o temperaturas sin llegar a fundirse:</p>
+                        <ul>
+                            <li><strong>Por Presión (Esquistosidad):</strong>
+                                <ul>
+                                    <li><em>Pizarra:</em> Baja presión.</li>
+                                    <li><em>Esquisto:</em> Presión media.</li>
+                                    <li><em>Gneis:</em> Alta presión y temperatura (forman bandas).</li>
+                                </ul>
+                            </li>
+                            <li><strong>Por Temperatura:</strong>
+                                <ul>
+                                    <li><em>Mármol:</em> Proviene de la caliza, recristalizada por calor (sin bandas).</li>
+                                    <li><em>Corneanas:</em> Alrededor de magmas.</li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </details>
+
+            </div>
+        </section>
+
+        <!-- 6. HISTORIA -->
+        <section id="historia" class="section-container">
+            <h2>Historia de la Tierra</h2>
+            
+            <!-- IMAGEN 7: HISTORIA -->
+            <div class="content-image-container">
+                <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/main/historia.png" alt="Línea del Tiempo" class="content-image">
+            </div>
+
+            <div class="history-timeline">
+                
+                <!-- Precámbrico -->
+                <div class="history-card left">
+                    <div class="history-content">
+                        <h3>Precámbrico (4500 - 541 Ma)</h3>
+                        <p><strong>Hadeo:</strong> Bombardeo de meteoritos, formación de la Tierra.</p>
+                        <p><strong>Arqueo:</strong> Primeras bacterias, origen del agua líquida y oxígeno.</p>
+                        <p><strong>Proterozoico:</strong> Células eucariotas. Supercontinente Rodinia.</p>
+                    </div>
+                </div>
+
+                <!-- Paleozoico -->
+                <div class="history-card right">
+                    <div class="history-content">
+                        <h3>Paleozoico (541 - 252 Ma)</h3>
+                        <p>Explosión de vida. Peces, anfibios y reptiles. Grandes bosques (carbón).</p>
+                        <p>Formación de Pangea.</p>
+                        <small>Fósiles: Trilobites, Helechos.</small>
+                    </div>
+                </div>
+
+                <!-- Mesozoico -->
+                <div class="history-card left">
+                    <div class="history-content">
+                        <h3>Mesozoico (252 - 66 Ma)</h3>
+                        <p>Era de los <strong>Dinosaurios</strong>. Ruptura de Pangea. Clima cálido.</p>
+                        <p>Extinción masiva K-T (Meteorito/Vulcanismo).</p>
+                        <small>Fósiles: Ammonites.</small>
+                    </div>
+                </div>
+
+                <!-- Cenozoico -->
+                <div class="history-card right">
+                    <div class="history-content">
+                        <h3>Cenozoico (66 Ma - Hoy)</h3>
+                        <p>Era de los mamíferos y aves. Aparición de los homínidos (Terciario) y humanos (Cuaternario).</p>
+                        <p>Glaciaciones.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 7. HIDROSFERA -->
+        <section id="hidrosfera" class="section-container water-theme">
+            <h2>Hidrosfera y Ciclo del Agua</h2>
+            <div class="grid-2">
+                <div>
+                    <h3>Importancia del Agua</h3>
+                    <ul style="margin-top:20px; padding-left:20px;">
+                        <li>Alta capacidad calorífica (regula Tª).</li>
+                        <li>Solvente universal (transporte).</li>
+                        <li>Dilatación anómala (el hielo flota, aislando el agua líquida debajo).</li>
+                    </ul>
+                </div>
+                <div class="water-cycle-diagram">
+                    <h4>El Ciclo del Agua</h4>
+                    
+                    <!-- IMAGEN 8: CICLO AGUA -->
+                    <div class="content-image-container">
+                        <img src="https://raw.githubusercontent.com/irati-lab/geoexploradores1eso/main/cicloagua.png" alt="Ciclo del Agua" class="content-image">
+                    </div>
+
+                    <p>Motor: <strong>El Sol</strong></p>
+                    <div style="margin-top:20px;">
+                        <div class="cycle-step">1. Evaporación</div>
+                        <div class="cycle-arrow">⬇</div>
+                        <div class="cycle-step">2. Condensación</div>
+                        <div class="cycle-arrow">⬇</div>
+                        <div class="cycle-step">3. Precipitación</div>
+                        <div class="cycle-arrow">⬇</div>
+                        <div class="cycle-step">4. Infiltración / Escorrentía</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>Encyclopedia Terra &copy; 2023. Fuentes: Documentación Educativa "Estructura de la Tierra".</p>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        // Lógica de Tabs
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].style.display = "none";
+                tabcontent[i].classList.remove("active-content");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].className = tablinks[i].className.replace(" active", "");
+            }
+            document.getElementById(tabName).style.display = "block";
+            evt.currentTarget.className += " active";
+            setTimeout(() => {
+                document.getElementById(tabName).classList.add("active-content");
+            }, 10);
+        }
+
+        // Smooth Scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Efecto Navbar al hacer scroll
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.style.padding = "0.5rem 5%";
+                navbar.style.background = "rgba(26, 83, 92, 0.98)";
+            } else {
+                navbar.style.padding = "1rem 5%";
+                navbar.style.background = "rgba(26, 83, 92, 0.9)";
+            }
+        });
+
+        // Toggle menú móvil
+        const burger = document.querySelector('.burger');
+        const nav = document.querySelector('.nav-links');
+        
+        burger.addEventListener('click', () => {
+            if(nav.style.display === "flex"){
+                nav.style.display = "none";
+            } else {
+                nav.style.display = "flex";
+                nav.style.flexDirection = "column";
+                nav.style.position = "absolute";
+                nav.style.top = "70px";
+                nav.style.right = "0";
+                nav.style.width = "100%";
+                nav.style.background = "var(--ocean)";
+                nav.style.padding = "20px";
+                nav.style.textAlign = "center";
+            }
+        });
+    </script>
+</body>
+</html>
